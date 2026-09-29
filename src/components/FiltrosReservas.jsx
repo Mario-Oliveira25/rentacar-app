@@ -1,7 +1,5 @@
 import { ESTADOS_RESERVA } from "../utils/reservas";
 
-// Barra de filtros das reservas. Os valores ficam na página (componentes controlados):
-// este componente só os mostra e avisa quando mudam.
 export default function FiltrosReservas({
   pesquisa,
   onPesquisaChange,

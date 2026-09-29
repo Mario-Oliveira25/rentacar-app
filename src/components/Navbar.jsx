@@ -16,7 +16,6 @@ export default function Navbar() {
         <ul className="navbar-nav ms-auto flex-wrap">
           {links.map((link) => (
             <li className="nav-item" key={link.to}>
-              {/* O NavLink põe a classe "active" no link da página atual */}
               <NavLink className="nav-link" to={link.to} end={link.to === "/"}>
                 {link.texto}
               </NavLink>

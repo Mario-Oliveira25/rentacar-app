@@ -9,7 +9,6 @@ import PaginaNaoEncontrada from "./pages/PaginaNaoEncontrada";
 export default function App() {
   return (
     <Routes>
-      {/* Todas as páginas partilham o Layout (navbar + rodapé) */}
       <Route element={<Layout />}>
         <Route path="/" element={<Inicio />} />
         <Route path="/carros/:id" element={<DetalheCarro />} />

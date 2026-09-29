@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 
-// Estrutura comum a todas as páginas. O <Outlet /> é onde aparece a página da rota atual.
 export default function Layout() {
   return (
     <>

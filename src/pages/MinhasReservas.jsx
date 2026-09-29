@@ -9,14 +9,11 @@ import FiltrosReservas from "../components/FiltrosReservas";
 import { formatarData } from "../utils/datas";
 import { estadoReserva } from "../utils/reservas";
 
-// Lista as reservas do tema rentacar (o GET /reservas já devolve só as nossas)
-// e permite cancelá-las.
 export default function MinhasReservas() {
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [erroCancelar, setErroCancelar] = useState(null);
-  // id da reserva que está a ser cancelada (null quando não há nenhuma)
   const [aCancelar, setACancelar] = useState(null);
   const [pesquisa, setPesquisa] = useState("");
   const [estado, setEstado] = useState("todas");
@@ -35,7 +32,6 @@ export default function MinhasReservas() {
     carregar();
   }, []);
 
-  // Lista a mostrar: só é recalculada quando as reservas ou os filtros mudam
   const reservasFiltradas = useMemo(() => {
     const texto = pesquisa.trim().toLowerCase();
 
@@ -48,12 +44,10 @@ export default function MinhasReservas() {
       return correspondeTexto && correspondeEstado;
     });
 
-    // O filter já devolve um array novo, por isso o sort não mexe no state
-    resultado.sort((a, b) =>
-      ordem === "asc"
-        ? a.dataInicio.localeCompare(b.dataInicio)
-        : b.dataInicio.localeCompare(a.dataInicio)
-    );
+    resultado.sort((a, b) => {
+      const comparacao = a.dataInicio.localeCompare(b.dataInicio);
+      return ordem === "asc" ? comparacao : -comparacao;
+    });
     return resultado;
   }, [reservas, pesquisa, estado, ordem]);
 
@@ -73,8 +67,7 @@ export default function MinhasReservas() {
     setACancelar(reserva.id);
     try {
       await cancelarReserva(reserva.id);
-      // Tira a reserva da lista sem voltar a pedir tudo à API
-      setReservas(reservas.filter((r) => r.id !== reserva.id));
+      setReservas((atuais) => atuais.filter((r) => r.id !== reserva.id));
     } catch (e) {
       setErroCancelar(e.message);
     } finally {

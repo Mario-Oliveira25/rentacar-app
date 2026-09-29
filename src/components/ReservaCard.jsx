@@ -3,8 +3,6 @@ import { calcularDias, formatarData } from "../utils/datas";
 import { formatarPreco } from "../utils/formatar";
 import { ESTADOS_RESERVA, estadoReserva } from "../utils/reservas";
 
-// Mostra os dados de uma reserva. Recebe a reserva por props, e a página decide
-// o que acontece ao carregar em "Cancelar" (onCancelar).
 export default function ReservaCard({ reserva, onCancelar, cancelando, desativado }) {
   const dias = calcularDias(reserva.dataInicio, reserva.dataFim);
   const chaveEstado = estadoReserva(reserva);
@@ -41,7 +39,6 @@ export default function ReservaCard({ reserva, onCancelar, cancelando, desativad
           <strong>{formatarPreco(reserva.total)}</strong>
           <div className="text-secondary small">Reserva n.º {reserva.id}</div>
         </div>
-        {/* Um aluguer que já terminou não faz sentido ser cancelado */}
         {chaveEstado !== "terminada" && (
           <button
             type="button"
