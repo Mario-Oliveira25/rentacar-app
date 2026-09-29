@@ -1,8 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { getItens } from "../services/api";
 import Loading from "../components/Loading";
 import MensagemErro from "../components/MensagemErro";
-import CarroCard from "../components/CarroCard";
+import EstadoVazio from "../components/EstadoVazio";
+import ListaCarros from "../components/ListaCarros";
 import useFavoritos from "../hooks/useFavoritos";
 
 export default function Favoritos() {
@@ -29,35 +31,28 @@ export default function Favoritos() {
     return carros.filter((carro) => favoritos.includes(carro.id));
   }, [carros, favoritos]);
 
-  if (loading) return <Loading />;
+  if (loading) return <Loading texto="A carregar favoritos…" />;
 
   return (
-    <div>
-      <h1 className="h3 mb-3">Meus Favoritos</h1>
+    <>
+      <h1 className="h3 mb-3">Os meus favoritos</h1>
 
       <MensagemErro mensagem={erro} />
 
-      {!erro && (
-        <>
-          {carrosFavoritos.length === 0 ? (
-            <div className="alert alert-info">
-              Ainda não adicionaste nenhum veículo aos favoritos.
-            </div>
-          ) : (
-            <div className="row row-cols-1 row-cols-md-3 g-4">
-              {carrosFavoritos.map((carro) => (
-                <div key={carro.id} className="col">
-                  <CarroCard
-                    carro={carro}
-                    favorito={isFavorito(carro.id)}
-                    onFavoritoClick={toggleFavorito}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-    </div>
+      {!erro &&
+        (carrosFavoritos.length === 0 ? (
+          <EstadoVazio mensagem="Ainda não adicionaste nenhum carro aos favoritos.">
+            <Link to="/" className="btn btn-primary">
+              Ver carros
+            </Link>
+          </EstadoVazio>
+        ) : (
+          <ListaCarros
+            carros={carrosFavoritos}
+            isFavorito={isFavorito}
+            onFavoritoClick={toggleFavorito}
+          />
+        ))}
+    </>
   );
 }

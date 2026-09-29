@@ -2,7 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import { getItens } from "../services/api";
 import Loading from "../components/Loading";
 import MensagemErro from "../components/MensagemErro";
-import FiltrosCarro from "../components/FiltrosCarros";
+import EstadoVazio from "../components/EstadoVazio";
+import FiltrosCarros from "../components/FiltrosCarros";
 import ListaCarros from "../components/ListaCarros";
 import useFavoritos from "../hooks/useFavoritos";
 
@@ -18,23 +19,16 @@ export default function Inicio() {
 
   const { toggleFavorito, isFavorito } = useFavoritos();
 
-  function carregar() {
-    setLoading(true);
-    setErro(null);
-
-    setTimeout(async () => {
+  useEffect(() => {
+    async function carregar() {
       try {
-        const dados = await getItens();
-        setCarros(dados);
+        setCarros(await getItens());
       } catch (e) {
         setErro(e.message);
       } finally {
         setLoading(false);
       }
-    }, 1500);
-  }
-
-  useEffect(() => {
+    }
     carregar();
   }, []);
 
@@ -49,15 +43,13 @@ export default function Inicio() {
   }, [carros]);
 
   const carrosFiltrados = useMemo(() => {
+    const texto = pesquisa.trim().toLowerCase();
+
     return carros
       .filter((carro) => {
-        const correspondeTexto = carro.nome
-          ?.toLowerCase()
-          .includes(pesquisa.toLowerCase());
-
+        const correspondeTexto = carro.nome.toLowerCase().includes(texto);
         const correspondeLocalizacao =
           !filtroLocalizacao || carro.localizacao === filtroLocalizacao;
-
         const correspondeCategoria =
           !filtroCategoria || carro.categoria === filtroCategoria;
 
@@ -71,17 +63,23 @@ export default function Inicio() {
       });
   }, [carros, pesquisa, filtroLocalizacao, filtroCategoria, ordenacao]);
 
-  if (loading) return <Loading />;
+  function limparFiltros() {
+    setPesquisa("");
+    setFiltroLocalizacao("");
+    setFiltroCategoria("");
+  }
+
+  if (loading) return <Loading texto="A carregar carros…" />;
 
   return (
-    <div>
-      <h1 className="h3 mb-3">Carros Disponíveis</h1>
+    <>
+      <h1 className="h3 mb-3">Carros disponíveis</h1>
 
       <MensagemErro mensagem={erro} />
 
       {!erro && (
         <>
-          <FiltrosCarro
+          <FiltrosCarros
             pesquisa={pesquisa}
             setPesquisa={setPesquisa}
             filtroLocalizacao={filtroLocalizacao}
@@ -94,23 +92,21 @@ export default function Inicio() {
             categorias={categoriasUnicas}
           />
 
-          <ListaCarros
-            carros={carrosFiltrados}
-            isFavorito={isFavorito}
-            onFavoritoClick={toggleFavorito}
-          />
-
-          <div className="d-flex justify-content-center my-4">
-            <button
-              type="button"
-              className="btn btn-outline-primary d-flex align-items-center gap-2"
-              onClick={carregar}
-            >
-              🔄 Recarregar Lista
-            </button>
-          </div>
+          {carrosFiltrados.length === 0 ? (
+            <EstadoVazio mensagem="Nenhum carro encontrado com os filtros selecionados.">
+              <button type="button" className="btn btn-outline-secondary" onClick={limparFiltros}>
+                Limpar filtros
+              </button>
+            </EstadoVazio>
+          ) : (
+            <ListaCarros
+              carros={carrosFiltrados}
+              isFavorito={isFavorito}
+              onFavoritoClick={toggleFavorito}
+            />
+          )}
         </>
       )}
-    </div>
+    </>
   );
 }
