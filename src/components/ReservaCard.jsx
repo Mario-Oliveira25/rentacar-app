@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import { calcularDias, formatarData } from "../utils/datas";
 import { formatarPreco } from "../utils/formatar";
 
-// Mostra os dados de uma reserva. Recebe a reserva por props.
-export default function ReservaCard({ reserva }) {
+// Mostra os dados de uma reserva. Recebe a reserva por props, e a página decide
+// o que acontece ao carregar em "Cancelar" (onCancelar).
+export default function ReservaCard({ reserva, onCancelar, cancelando, desativado }) {
   const dias = calcularDias(reserva.dataInicio, reserva.dataFim);
 
   return (
@@ -30,8 +31,18 @@ export default function ReservaCard({ reserva }) {
       </div>
 
       <div className="card-footer d-flex justify-content-between align-items-center">
-        <span className="text-secondary small">Reserva n.º {reserva.id}</span>
-        <strong>{formatarPreco(reserva.total)}</strong>
+        <div>
+          <strong>{formatarPreco(reserva.total)}</strong>
+          <div className="text-secondary small">Reserva n.º {reserva.id}</div>
+        </div>
+        <button
+          type="button"
+          className="btn btn-outline-danger btn-sm"
+          onClick={() => onCancelar(reserva)}
+          disabled={desativado}
+        >
+          {cancelando ? "A cancelar…" : "Cancelar"}
+        </button>
       </div>
     </div>
   );
