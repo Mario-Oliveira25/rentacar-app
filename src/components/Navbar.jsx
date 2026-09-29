@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="navbar navbar-expand navbar-dark bg-dark">
       <div className="container">
         <Link className="navbar-brand fw-bold" to="/">
-          🚗 Rent-a-car
+          Rent-a-car
         </Link>
         <ul className="navbar-nav ms-auto flex-wrap">
           {links.map((link) => (

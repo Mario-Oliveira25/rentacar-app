@@ -4,7 +4,7 @@ import { getReservas } from "../services/api";
 import Loading from "../components/Loading";
 import MensagemErro from "../components/MensagemErro";
 import EstadoVazio from "../components/EstadoVazio";
-import { formatarData } from "../utils/datas";
+import ReservaCard from "../components/ReservaCard";
 
 // Lista as reservas do tema rentacar (o GET /reservas já devolve só as nossas).
 // TODO (Pessoa 3): mostrar mais detalhes de cada reserva e permitir cancelar.
@@ -42,14 +42,13 @@ export default function MinhasReservas() {
       )}
 
       {reservas.length > 0 && (
-        <ul className="list-group">
+        <div className="row g-3">
           {reservas.map((reserva) => (
-            <li key={reserva.id} className="list-group-item">
-              <strong>{reserva.itemNome}</strong> —{" "}
-              {formatarData(reserva.dataInicio)} a {formatarData(reserva.dataFim)}
-            </li>
+            <div key={reserva.id} className="col-md-6 col-lg-4">
+              <ReservaCard reserva={reserva} />
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </>
   );
