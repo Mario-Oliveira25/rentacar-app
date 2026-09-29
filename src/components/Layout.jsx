@@ -5,11 +5,11 @@ export default function Layout() {
   return (
     <>
       <Navbar />
-      <main className="container py-4">
+      <main className="container py-4 py-lg-5">
         <Outlet />
       </main>
-      <footer className="bg-dark text-white-50 text-center py-3 small">
-        Rent-a-car · Projeto Final UC00621
+      <footer className="app-footer text-center py-3 small">
+        © {new Date().getFullYear()} Rent-a-car. Todos os direitos reservados.
       </footer>
     </>
   );

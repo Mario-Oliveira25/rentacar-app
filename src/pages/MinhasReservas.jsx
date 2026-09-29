@@ -79,7 +79,10 @@ export default function MinhasReservas() {
 
   return (
     <>
-      <h1 className="h3 mb-3">As minhas reservas</h1>
+      <header className="pagina-cabecalho">
+        <h1 className="h3 mb-1">As minhas reservas</h1>
+        <p className="text-secondary mb-0">Consulta e gere as reservas feitas.</p>
+      </header>
       <MensagemErro mensagem={erro} />
       <MensagemErro mensagem={erroCancelar} />
 

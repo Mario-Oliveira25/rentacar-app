@@ -35,7 +35,14 @@ export default function Favoritos() {
 
   return (
     <>
-      <h1 className="h3 mb-3">Os meus favoritos</h1>
+      <Link to="/" className="btn btn-link px-0 mb-3">
+        ← Voltar aos carros
+      </Link>
+
+      <header className="pagina-cabecalho">
+        <h1 className="h3 mb-1">Os meus favoritos</h1>
+        <p className="text-secondary mb-0">Os carros que guardaste para ver mais tarde.</p>
+      </header>
 
       <MensagemErro mensagem={erro} />
 

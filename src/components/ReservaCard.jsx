@@ -15,7 +15,11 @@ export default function ReservaCard({ reserva, onCancelar, cancelando, desativad
           <h2 className="h5 card-title mb-0">
             <Link to={`/carros/${reserva.itemId}`}>{reserva.itemNome}</Link>
           </h2>
-          <span className={`badge text-bg-${estado.cor}`}>{estado.texto}</span>
+          <span
+            className={`badge border bg-${estado.cor}-subtle text-${estado.cor}-emphasis border-${estado.cor}-subtle`}
+          >
+            {estado.texto}
+          </span>
         </div>
 
         <p className="mb-2">
@@ -34,9 +38,9 @@ export default function ReservaCard({ reserva, onCancelar, cancelando, desativad
         </ul>
       </div>
 
-      <div className="card-footer d-flex justify-content-between align-items-center">
+      <div className="card-footer d-flex justify-content-between align-items-center py-3">
         <div>
-          <strong>{formatarPreco(reserva.total)}</strong>
+          <span className="preco">{formatarPreco(reserva.total)}</span>
           <div className="text-secondary small">Reserva n.º {reserva.id}</div>
         </div>
         {chaveEstado !== "terminada" && (

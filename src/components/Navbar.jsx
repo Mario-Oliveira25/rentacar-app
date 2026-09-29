@@ -8,9 +8,9 @@ const links = [
 
 export default function Navbar() {
   return (
-    <nav className="navbar navbar-expand navbar-dark bg-dark">
+    <nav className="navbar navbar-expand app-navbar sticky-top">
       <div className="container">
-        <Link className="navbar-brand fw-bold" to="/">
+        <Link className="navbar-brand" to="/">
           Rent-a-car
         </Link>
         <ul className="navbar-nav ms-auto flex-wrap">

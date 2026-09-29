@@ -155,6 +155,17 @@ export default function DetalheCarro() {
     );
   }
 
+  const caracteristicas = [
+    ["Localização", carro.localizacao],
+    ["Passageiros", carro.capacidade],
+    ["Caixa", carro.caixa],
+    ["Combustível", carro.combustivel],
+    ["Portas", carro.portas],
+    ["Malas", carro.malas],
+    ["Avaliação", `${carro.avaliacao} / 5`],
+    ["Categoria", carro.categoria],
+  ];
+
   return (
     <>
       <Link to="/" className="btn btn-link px-0 mb-3">
@@ -162,50 +173,40 @@ export default function DetalheCarro() {
       </Link>
 
       <div className="row g-4">
-        <div className="col-md-6">
+        <div className="col-lg-6">
           <img
             src={carro.imagem || imagemSemCarro}
             alt={carro.nome}
-            className="img-fluid rounded w-100"
+            className="carro-imagem carro-imagem-detalhe"
           />
         </div>
 
-        <div className="col-md-6">
-          <h1>{carro.nome}</h1>
+        <div className="col-lg-6">
+          <span className="badge border bg-warning-subtle text-warning-emphasis border-warning-subtle mb-2">
+            {carro.categoria}
+          </span>
+          <h1 className="h2 mb-2">{carro.nome}</h1>
 
           <p className="text-secondary">{carro.descricao}</p>
 
-          <p className="fs-4 fw-bold">{formatarPreco(carro.precoDia)} / dia</p>
+          <p className="preco-destaque mb-3">
+            {formatarPreco(carro.precoDia)} <small>/ dia</small>
+          </p>
 
-          <dl className="row">
-            <dt className="col-sm-5">Localização</dt>
-            <dd className="col-sm-7">{carro.localizacao}</dd>
-
-            <dt className="col-sm-5">Categoria</dt>
-            <dd className="col-sm-7">{carro.categoria}</dd>
-
-            <dt className="col-sm-5">Avaliação</dt>
-            <dd className="col-sm-7">{carro.avaliacao}</dd>
-
-            <dt className="col-sm-5">Capacidade</dt>
-            <dd className="col-sm-7">{carro.capacidade} passageiros</dd>
-
-            <dt className="col-sm-5">Caixa</dt>
-            <dd className="col-sm-7">{carro.caixa}</dd>
-
-            <dt className="col-sm-5">Combustível</dt>
-            <dd className="col-sm-7">{carro.combustivel}</dd>
-
-            <dt className="col-sm-5">Portas</dt>
-            <dd className="col-sm-7">{carro.portas}</dd>
-
-            <dt className="col-sm-5">Malas</dt>
-            <dd className="col-sm-7">{carro.malas}</dd>
-          </dl>
+          <div className="row row-cols-2 row-cols-sm-4 g-2">
+            {caracteristicas.map(([rotulo, valor]) => (
+              <div className="col" key={rotulo}>
+                <div className="caracteristica">
+                  <div className="caracteristica-rotulo">{rotulo}</div>
+                  <div className="caracteristica-valor">{valor}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="col-12">
-          <div className="card shadow-sm">
+          <div className="card">
             <div className="card-body">
               <h2 className="h4">Fazer reserva</h2>
 
@@ -327,7 +328,7 @@ export default function DetalheCarro() {
                   </div>
 
                   {diasEstimados > 0 && (
-                    <p className="mt-3 mb-2">
+                    <p className="estimativa mt-3 mb-2">
                       Estimativa: {diasEstimados}{" "}
                       {diasEstimados === 1 ? "dia" : "dias"} ×{" "}
                       {formatarPreco(carro.precoDia)} ={" "}
