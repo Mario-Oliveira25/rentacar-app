@@ -14,7 +14,7 @@ reserva e gestão de reservas, a comunicar com a API do projeto final.
    ```
 
 3. Abrir o endereço que aparece no terminal (normalmente http://localhost:5173).
-   A página inicial deve dizer "Ligação à API OK".
+   A página inicial mostra a lista de carros.
 
 Bibliotecas: React, React Router (`react-router-dom`) e Bootstrap (só o CSS).
 
