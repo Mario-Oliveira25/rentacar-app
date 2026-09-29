@@ -11,6 +11,7 @@ export default function Inicio() {
   const [carros, setCarros] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
+  const [pedidoCarregamento, setPedidoCarregamento] = useState(0);
 
   const [pesquisa, setPesquisa] = useState("");
   const [filtroLocalizacao, setFiltroLocalizacao] = useState("");
@@ -30,7 +31,13 @@ export default function Inicio() {
       }
     }
     carregar();
-  }, []);
+  }, [pedidoCarregamento]);
+
+  function recarregar() {
+    setLoading(true);
+    setErro(null);
+    setPedidoCarregamento((atual) => atual + 1);
+  }
 
   const localizacoesUnicas = useMemo(() => {
     const lista = carros.map((c) => c.localizacao).filter(Boolean);
@@ -73,9 +80,20 @@ export default function Inicio() {
 
   return (
     <>
-      <h1 className="h3 mb-3">Carros disponíveis</h1>
+      <header className="pagina-cabecalho pagina-cabecalho-destaque">
+        <h1 className="h2 mb-2">Encontra o carro certo para a tua viagem</h1>
+        <p className="text-secondary mb-0">
+          Compara preços, escolhe as datas e reserva em poucos passos.
+        </p>
+      </header>
 
       <MensagemErro mensagem={erro} />
+
+      {erro && (
+        <button type="button" className="btn btn-outline-primary" onClick={recarregar}>
+          Tentar novamente
+        </button>
+      )}
 
       {!erro && (
         <>
@@ -90,6 +108,7 @@ export default function Inicio() {
             setOrdenacao={setOrdenacao}
             localizacoes={localizacoesUnicas}
             categorias={categoriasUnicas}
+            onRecarregar={recarregar}
           />
 
           {carrosFiltrados.length === 0 ? (

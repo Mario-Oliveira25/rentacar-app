@@ -8,9 +8,11 @@ import {
   getItem,
   verificarDisponibilidade,
 } from "../services/api";
-import { calcularDias, hojeISO } from "../utils/datas";
+import { calcularDias, formatarData, hojeISO } from "../utils/datas";
 import { formatarPreco } from "../utils/formatar";
 import imagemSemCarro from "../assets/carro-sem-imagem.svg";
+
+const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function DetalheCarro() {
   const { id } = useParams();
@@ -23,6 +25,7 @@ export default function DetalheCarro() {
   const [quantidade, setQuantidade] = useState(1);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const [errosCampos, setErrosCampos] = useState({});
   const [erroReserva, setErroReserva] = useState("");
   const [aReservar, setAReservar] = useState(false);
   const [reservaConfirmada, setReservaConfirmada] = useState(null);
@@ -49,37 +52,62 @@ export default function DetalheCarro() {
   const totalEstimado =
     carro && diasEstimados > 0 ? diasEstimados * carro.precoDia : 0;
 
-  async function submeterReserva(evento) {
-    evento.preventDefault();
-
-    setErroReserva("");
-    setReservaConfirmada(null);
-
-    if (!dataInicio || !dataFim) {
-      setErroReserva("Preenche as datas de levantamento e devolução.");
-      return;
-    }
-
-    if (dataFim < dataInicio) {
-      setErroReserva(
-        "A data de devolução não pode ser anterior à data de levantamento.",
-      );
-      return;
-    }
-
+  function validar() {
+    const erros = {};
     const quantidadeNumerica = Number(quantidade);
+
+    if (!dataInicio) {
+      erros.dataInicio = "Escolhe a data de levantamento.";
+    } else if (dataInicio < hojeISO()) {
+      erros.dataInicio = "A data de levantamento não pode ser anterior a hoje.";
+    }
+
+    if (!dataFim) {
+      erros.dataFim = "Escolhe a data de devolução.";
+    } else if (dataInicio && dataFim < dataInicio) {
+      erros.dataFim = "A data de devolução não pode ser anterior à de levantamento.";
+    }
 
     if (
       !Number.isInteger(quantidadeNumerica) ||
       quantidadeNumerica < 1 ||
       quantidadeNumerica > carro.capacidade
     ) {
-      setErroReserva(
-        `A quantidade deve estar entre 1 e ${carro.capacidade} passageiros.`,
-      );
-      return;
+      erros.quantidade = `Escolhe entre 1 e ${carro.capacidade} passageiros.`;
     }
 
+    if (!nome.trim()) {
+      erros.nome = "Indica o teu nome.";
+    }
+
+    if (!EMAIL_VALIDO.test(email.trim())) {
+      erros.email = "Indica um email válido (ex.: ana@exemplo.pt).";
+    }
+
+    return erros;
+  }
+
+  function classeCampo(campo) {
+    return errosCampos[campo] ? "form-control is-invalid" : "form-control";
+  }
+
+  function novaReserva() {
+    setReservaConfirmada(null);
+    setDataInicio("");
+    setDataFim("");
+    setQuantidade(1);
+  }
+
+  async function submeterReserva(evento) {
+    evento.preventDefault();
+
+    setErroReserva("");
+
+    const erros = validar();
+    setErrosCampos(erros);
+    if (Object.keys(erros).length > 0) return;
+
+    const quantidadeNumerica = Number(quantidade);
     setAReservar(true);
 
     try {
@@ -116,95 +144,102 @@ export default function DetalheCarro() {
     return <Loading texto="A carregar carro..." />;
   }
 
-  if (erro) {
+  if (erro || !carro) {
     return (
-      <section className="container py-4">
-        <MensagemErro mensagem={erro} />
+      <>
+        <MensagemErro mensagem={erro || "Carro não encontrado."} />
         <Link to="/" className="btn btn-outline-primary">
           Voltar aos carros
         </Link>
-      </section>
+      </>
     );
   }
 
-  if (!carro) {
-    return (
-      <section className="container py-4">
-        <MensagemErro mensagem="Carro não encontrado." />
-        <Link to="/" className="btn btn-outline-primary">
-          Voltar aos carros
-        </Link>
-      </section>
-    );
-  }
+  const caracteristicas = [
+    ["Localização", carro.localizacao],
+    ["Passageiros", carro.capacidade],
+    ["Caixa", carro.caixa],
+    ["Combustível", carro.combustivel],
+    ["Portas", carro.portas],
+    ["Malas", carro.malas],
+    ["Avaliação", `${carro.avaliacao} / 5`],
+    ["Categoria", carro.categoria],
+  ];
 
   return (
-    <main className="container py-4">
+    <>
       <Link to="/" className="btn btn-link px-0 mb-3">
         ← Voltar aos carros
       </Link>
 
       <div className="row g-4">
-        <div className="col-md-6">
+        <div className="col-lg-6">
           <img
             src={carro.imagem || imagemSemCarro}
             alt={carro.nome}
-            className="img-fluid rounded w-100"
+            className="carro-imagem carro-imagem-detalhe"
           />
         </div>
 
-        <div className="col-md-6">
-          <h1>{carro.nome}</h1>
+        <div className="col-lg-6">
+          <span className="badge border bg-warning-subtle text-warning-emphasis border-warning-subtle mb-2">
+            {carro.categoria}
+          </span>
+          <h1 className="h2 mb-2">{carro.nome}</h1>
 
           <p className="text-secondary">{carro.descricao}</p>
 
-          <p className="fs-4 fw-bold">{formatarPreco(carro.precoDia)} / dia</p>
+          <p className="preco-destaque mb-3">
+            {formatarPreco(carro.precoDia)} <small>/ dia</small>
+          </p>
 
-          <dl className="row">
-            <dt className="col-sm-5">Localização</dt>
-            <dd className="col-sm-7">{carro.localizacao}</dd>
-
-            <dt className="col-sm-5">Categoria</dt>
-            <dd className="col-sm-7">{carro.categoria}</dd>
-
-            <dt className="col-sm-5">Avaliação</dt>
-            <dd className="col-sm-7">{carro.avaliacao}</dd>
-
-            <dt className="col-sm-5">Capacidade</dt>
-            <dd className="col-sm-7">{carro.capacidade} passageiros</dd>
-
-            <dt className="col-sm-5">Caixa</dt>
-            <dd className="col-sm-7">{carro.caixa}</dd>
-
-            <dt className="col-sm-5">Combustível</dt>
-            <dd className="col-sm-7">{carro.combustivel}</dd>
-
-            <dt className="col-sm-5">Portas</dt>
-            <dd className="col-sm-7">{carro.portas}</dd>
-
-            <dt className="col-sm-5">Malas</dt>
-            <dd className="col-sm-7">{carro.malas}</dd>
-          </dl>
+          <div className="row row-cols-2 row-cols-sm-4 g-2">
+            {caracteristicas.map(([rotulo, valor]) => (
+              <div className="col" key={rotulo}>
+                <div className="caracteristica">
+                  <div className="caracteristica-rotulo">{rotulo}</div>
+                  <div className="caracteristica-valor">{valor}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="col-12">
-          <div className="card shadow-sm">
+          <div className="card">
             <div className="card-body">
               <h2 className="h4">Fazer reserva</h2>
 
               <MensagemErro mensagem={erroReserva} />
 
               {reservaConfirmada ? (
-                <div className="alert alert-success" role="alert">
+                <div className="alert alert-success mb-0" role="alert">
                   <h3 className="h5">Reserva criada com sucesso!</h3>
                   <p className="mb-1">
+                    {formatarData(reservaConfirmada.dataInicio)} a{" "}
+                    {formatarData(reservaConfirmada.dataFim)} ·{" "}
+                    {reservaConfirmada.quantidade}{" "}
+                    {reservaConfirmada.quantidade === 1 ? "passageiro" : "passageiros"}
+                  </p>
+                  <p className="mb-3">
                     Total da reserva:{" "}
                     <strong>{formatarPreco(reservaConfirmada.total)}</strong>
                   </p>
-                  <p className="mb-0">Este é o valor calculado pela API.</p>
+                  <div className="d-flex flex-wrap gap-2">
+                    <Link to="/reservas" className="btn btn-success">
+                      Ver as minhas reservas
+                    </Link>
+                    <button
+                      type="button"
+                      className="btn btn-outline-success"
+                      onClick={novaReserva}
+                    >
+                      Fazer outra reserva
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <form onSubmit={submeterReserva}>
+                <form onSubmit={submeterReserva} noValidate>
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label htmlFor="dataInicio" className="form-label">
@@ -213,7 +248,7 @@ export default function DetalheCarro() {
                       <input
                         id="dataInicio"
                         type="date"
-                        className="form-control"
+                        className={classeCampo("dataInicio")}
                         min={hojeISO()}
                         value={dataInicio}
                         onChange={(evento) => {
@@ -223,8 +258,8 @@ export default function DetalheCarro() {
                             setDataFim("");
                           }
                         }}
-                        required
                       />
+                      <div className="invalid-feedback">{errosCampos.dataInicio}</div>
                     </div>
 
                     <div className="col-md-6">
@@ -234,12 +269,12 @@ export default function DetalheCarro() {
                       <input
                         id="dataFim"
                         type="date"
-                        className="form-control"
+                        className={classeCampo("dataFim")}
                         min={dataInicio || hojeISO()}
                         value={dataFim}
                         onChange={(evento) => setDataFim(evento.target.value)}
-                        required
                       />
+                      <div className="invalid-feedback">{errosCampos.dataFim}</div>
                     </div>
 
                     <div className="col-md-4">
@@ -249,15 +284,15 @@ export default function DetalheCarro() {
                       <input
                         id="quantidade"
                         type="number"
-                        className="form-control"
+                        className={classeCampo("quantidade")}
                         min="1"
                         max={carro.capacidade}
                         value={quantidade}
                         onChange={(evento) =>
                           setQuantidade(evento.target.value)
                         }
-                        required
                       />
+                      <div className="invalid-feedback">{errosCampos.quantidade}</div>
                       <div className="form-text">
                         Máximo: {carro.capacidade} passageiros.
                       </div>
@@ -270,11 +305,11 @@ export default function DetalheCarro() {
                       <input
                         id="nome"
                         type="text"
-                        className="form-control"
+                        className={classeCampo("nome")}
                         value={nome}
                         onChange={(evento) => setNome(evento.target.value)}
-                        required
                       />
+                      <div className="invalid-feedback">{errosCampos.nome}</div>
                     </div>
 
                     <div className="col-md-4">
@@ -284,16 +319,16 @@ export default function DetalheCarro() {
                       <input
                         id="email"
                         type="email"
-                        className="form-control"
+                        className={classeCampo("email")}
                         value={email}
                         onChange={(evento) => setEmail(evento.target.value)}
-                        required
                       />
+                      <div className="invalid-feedback">{errosCampos.email}</div>
                     </div>
                   </div>
 
                   {diasEstimados > 0 && (
-                    <p className="mt-3 mb-2">
+                    <p className="estimativa mt-3 mb-2">
                       Estimativa: {diasEstimados}{" "}
                       {diasEstimados === 1 ? "dia" : "dias"} ×{" "}
                       {formatarPreco(carro.precoDia)} ={" "}
@@ -314,6 +349,6 @@ export default function DetalheCarro() {
           </div>
         </div>
       </div>
-    </main>
+    </>
   );
 }

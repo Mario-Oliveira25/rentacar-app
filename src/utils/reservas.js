@@ -1,7 +1,7 @@
 import { hojeISO } from "./datas";
 
 export const ESTADOS_RESERVA = {
-  proxima: { texto: "Próxima", cor: "primary" },
+  proxima: { texto: "Próxima", cor: "warning" },
   aDecorrer: { texto: "A decorrer", cor: "success" },
   terminada: { texto: "Terminada", cor: "secondary" },
 };

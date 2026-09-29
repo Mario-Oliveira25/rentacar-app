@@ -14,7 +14,7 @@ reserva e gestão de reservas, a comunicar com a API do projeto final.
    ```
 
 3. Abrir o endereço que aparece no terminal (normalmente http://localhost:5173).
-   A página inicial deve dizer "Ligação à API OK".
+   A página inicial mostra a lista de carros.
 
 Bibliotecas: React, React Router (`react-router-dom`) e Bootstrap (só o CSS).
 
@@ -22,24 +22,36 @@ Bibliotecas: React, React Router (`react-router-dom`) e Bootstrap (só o CSS).
 
 ```
 src/
-├── main.jsx              # BrowserRouter + CSS do Bootstrap
-├── App.jsx               # definição das rotas
-├── index.css             # ajustes globais de estilo
+├── main.jsx                  # BrowserRouter + CSS do Bootstrap
+├── App.jsx                   # definição das rotas
+├── index.css                 # tema escuro (cores em variáveis) e estilos próprios
 ├── assets/
-│   └── carro-sem-imagem.svg   # imagem de substituição quando item.imagem é null
-├── components/           # componentes reutilizáveis
-│   ├── Layout.jsx        # Navbar + <Outlet /> + rodapé
+│   └── carro-sem-imagem.svg  # imagem de substituição quando carro.imagem é null
+├── components/
+│   ├── Layout.jsx            # Navbar + <Outlet /> + rodapé
 │   ├── Navbar.jsx
-│   ├── Loading.jsx       # <Loading />
-│   ├── MensagemErro.jsx  # <MensagemErro mensagem={erro} />
-│   └── EstadoVazio.jsx   # <EstadoVazio mensagem="…">botão opcional</EstadoVazio>
-├── hooks/                # hooks próprios (começam por "use")
-├── pages/                # uma página por rota
+│   ├── Loading.jsx           # <Loading texto="…" />
+│   ├── MensagemErro.jsx      # <MensagemErro mensagem={erro} />
+│   ├── EstadoVazio.jsx       # <EstadoVazio mensagem="…">botão opcional</EstadoVazio>
+│   ├── CarroCard.jsx         # card de um carro (link para o detalhe + favorito)
+│   ├── ListaCarros.jsx       # grelha de CarroCard (listagem e favoritos)
+│   ├── FiltrosCarros.jsx     # pesquisa, localização, categoria, ordenação e recarregar
+│   ├── ReservaCard.jsx       # card de uma reserva (estado + cancelar)
+│   └── FiltrosReservas.jsx   # pesquisa, estado e ordenação das reservas
+├── hooks/
+│   └── useFavoritos.js       # favoritos guardados no localStorage
+├── pages/
+│   ├── Inicio.jsx            # listagem de carros
+│   ├── DetalheCarro.jsx      # detalhe + formulário de reserva
+│   ├── Favoritos.jsx
+│   ├── MinhasReservas.jsx
+│   └── PaginaNaoEncontrada.jsx
 ├── services/
-│   └── api.js            # TODOS os pedidos à API
+│   └── api.js                # TODOS os pedidos à API
 └── utils/
-    ├── datas.js          # calcularDias, hojeISO, formatarData
-    └── formatar.js       # formatarPreco
+    ├── datas.js              # calcularDias, hojeISO, formatarData
+    ├── formatar.js           # formatarPreco
+    └── reservas.js           # estadoReserva (próxima, a decorrer, terminada)
 ```
 
 ## Rotas
